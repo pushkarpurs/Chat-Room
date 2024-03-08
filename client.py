@@ -7,12 +7,14 @@ alias=""
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(('127.0.0.1', 12345))
 exit_flag=True
+
 def client_receive():
     global exit_flag
     global alias
     while exit_flag:
         try:
             message = client.recv(1024).decode('utf-8')
+            #The first three cases are for handling CLIENTS joining the SERVER
             if message == "Password?":
                 password=input('Enter the Password>>> ');
                 client.send(password.encode('utf-8'))
@@ -22,6 +24,7 @@ def client_receive():
                 client.send(alias.encode('utf-8'))
                 send_thread.start()
                 continue
+            #The EXIT command is also handled here
             elif message == "Incorrect Password" or message ==":Exit":
                 if message == "Incorrect Password":
                     print("You entered the incorrect password")
@@ -30,6 +33,7 @@ def client_receive():
                 client.close();
                 continue
             elif message[0:5]==":FILE":
+                #This handles recieving files from the server
                 fname="2"+message[5:]
                 with open(fname,'wb') as f:
                     while True:
@@ -52,9 +56,11 @@ def client_send():
     while exit_flag:
         message = input("")
         client.send(message.encode('utf-8'))
+        #Handle file trasnfer
         if message[0]==':' and message!=":Exit":
             print("Sending File");
             fname=message[1:]
+            #The below is a loop to send the file to the server
             with open(fname,'rb') as f:
                 while True:
                     data=f.read(2048)
@@ -62,10 +68,12 @@ def client_send():
                     if not data:
                         break
                     client.send(data)
+            #This signals the server to exit the recieving loop
             client.send("***END***".encode('utf-8'));
             print("File sent")
-            
+          
+#We create two threads one for recieving messages from the server          
 receive_thread = threading.Thread(target=client_receive)
 receive_thread.start()
-
+#And another to send messages to the server
 send_thread = threading.Thread(target=client_send)
