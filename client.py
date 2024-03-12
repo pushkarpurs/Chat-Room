@@ -32,9 +32,9 @@ def client_receive():
                 exit_flag=False
                 client.close();
                 continue
-            elif message[0:5]==":FILE":
+            elif message[0:5]==":File":
                 #This handles recieving files from the server
-                fname="2"+message[5:]
+                fname="2"+message[6:]
                 with open(fname,'wb') as f:
                     while True:
                         data=client.recv(2048)
@@ -42,7 +42,9 @@ def client_receive():
                             break
                         f.write(data)
                         #print(data)
-                print("Recieved File "+message[5:])
+                data=client.recv(2048)
+                data=data.decode('utf-8');
+                print("Recieved File"+message[5:]+" from "+data);
             else:
                 print(message)
         except:
@@ -57,9 +59,9 @@ def client_send():
         message = input("")
         client.send(message.encode('utf-8'))
         #Handle file trasnfer
-        if message[0]==':' and message!=":Exit":
+        if message[0:5]==':File':
             print("Sending File");
-            fname=message[1:]
+            fname=message[6:]
             #The below is a loop to send the file to the server
             with open(fname,'rb') as f:
                 while True:

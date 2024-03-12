@@ -13,6 +13,6 @@ STEPS:
 8. To send a MESSAGE, type it in normally
 9.  Do NOT BEGIN with the ':' character
 10. To EXIT the room enter ':Exit'
-11. To send a FILE enter ':<FILENAME>'
+11. To send a FILE enter ':File <FILENAME>'
 12. Ensure the FILE is in the SAME DIRECTORY as the CLIENT program sending it
 13. Ensure CLIENTS are present in DIFFERENT DIRECTORIES to prevent reading and writing the same file
