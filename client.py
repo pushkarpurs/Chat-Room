@@ -42,9 +42,7 @@ def client_receive():
                             break
                         f.write(data)
                         #print(data)
-                data=client.recv(2048)
-                data=data.decode('utf-8');
-                print("Recieved File"+message[5:]+" from "+data);
+                print("Recieved File"+message[5:]);
             else:
                 print(message)
         except:

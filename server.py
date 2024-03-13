@@ -46,7 +46,6 @@ def broadcastfile(dmessage,clientx,aliasx):
                         break
                     client.send(data)
             client.send("***END***".encode('utf-8'));
-            client.send(alias.encode("utf-8"));
     print("File Sent")
     os.remove("1"+dmessage[6:])
         
