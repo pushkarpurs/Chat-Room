@@ -64,20 +64,24 @@ def handle_client(client):
                 client.send(":Exit".encode("utf-8"));
                 client.close();
                 raise ValueError("Invalid value")
-            #Here we handle the sending of files to the clients
+            #Switching between messaging one client and all the clients handled here
             elif(dmessage[0:3]==':Dm'):
                 print("DMING")
-                # dmal=dmessage[4:]
-                # print(dmal)
-                # if(dmal=="All"):
-                    # dm[index]=None
-                # else:
-                    # try:
-                        # index2=aliases.index(dmal)
-                        # dm[index]=clients[index2]
-                    # except:
-                        # print("Alias Doesnt Exist")
-                        # client.send(("Alias",dmal,"Not found").encode('utf-8'))
+                dmal=dmessage[4:].encode('utf-8')
+                #print(dmal)
+                if(dmal=="All".encode('utf-8')):
+                    dm[index]=None
+                    print("All");
+                    client.send("Messaging everyone".encode('utf-8'))
+                elif dmal in aliases and dmal!=alias:
+                    print("Found")
+                    client.send("Direct Messaging ".encode('utf-8')+dmal)
+                    index2=aliases.index(dmal)
+                    dm[index]=clients[index2]
+                else:
+                    print("Not found")
+                    client.send("Alias Not found".encode('utf-8'))
+            #Here we handle the sending of files to the clients
             elif(dmessage[0:5]==':File'):
                 print("Recieving File")
                 fname="1"+dmessage[6:]
@@ -129,16 +133,16 @@ def receive():
                 client.close()
                 continue
         #Requesting for the clients alias and confirming connection to the chat room
+        time.sleep(1)
         client.send('alias?'.encode('utf-8'))
         alias = client.recv(1024)
         aliases.append(alias)
         clients.append(client)
         dm.append(None)
         print('The alias of this client is ',(alias.decode('utf-8')))
-        broadcast(alias+' has connected to the chat room'.encode('utf-8'))
-        client.send('\nyou are now connected!'.encode('utf-8'))
+        broadcast(alias+' has connected to the chat room'.encode('utf-8'), client)
+        client.send('\nServer: You are now connected!\n'.encode('utf-8'))
         thread = threading.Thread(target=handle_client, args=(client,))
         thread.start()
 
-if __name__ == "__main__":
-    receive()
+receive()

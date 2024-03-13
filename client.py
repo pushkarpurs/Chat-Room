@@ -16,7 +16,7 @@ def client_receive():
             message = client.recv(1024).decode('utf-8')
             #The first three cases are for handling CLIENTS joining the SERVER
             if message == "Password?":
-                password=input('Enter the Password>>> ');
+                password=input('Enter the Password >>> ');
                 client.send(password.encode('utf-8'))
                 continue
             elif message == "alias?":
@@ -42,7 +42,7 @@ def client_receive():
                             break
                         f.write(data)
                         #print(data)
-                print("Recieved File"+message[5:]);
+                # print("Recieved File"+message[5:]);
             else:
                 print(message)
         except:
