@@ -61,6 +61,7 @@ def dmsendfile(index, aliasx, fname):
             if not data:
                 break
             client.send(data)
+    time.sleep(1)
     client.send("***END***".encode('utf-8'))
     print("Deleting "+fname)
     print("File sent")

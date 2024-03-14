@@ -78,6 +78,7 @@ def client_send():
                             break
                         client.send(data)
                 #This signals the server to exit the recieving loop
+                time.sleep(1)
                 client.send("***END***".encode('utf-8'));
                 print("File sent")
             except FileNotFoundError:
