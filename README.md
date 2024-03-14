@@ -14,6 +14,10 @@ STEPS:
 9.  Do NOT BEGIN with the ':' character
 10. To EXIT the room enter ':Exit'
 11. To send a FILE enter ':File <FILENAME>'
-12. Ensure the FILE is in the SAME DIRECTORY as the CLIENT program sending it
+12. Ensure the FILE is in the SAME DIRECTORY or a DAUGHTER DIRECTORY to the CLIENT program sending it
 13. Ensure CLIENTS are present in DIFFERENT DIRECTORIES to prevent reading and writing the same file
 14. Switch between messaging EVERYONE ':Dm All' and a SINGLE CLIENT ':Dm <ALIAS>'
+
+The recieved file is appended with 2 and the buffered file is appended with 1
+this is done to ensure that testing is easier. we can execute all the programs in the same directory
+without having to read to and write from the same file simultaneously

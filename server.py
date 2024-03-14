@@ -25,18 +25,18 @@ def broadcast(message,clientx="",aliasx="Server".encode('utf-8')):
             now = datetime.now()
             current_time = ("<"+now.strftime("%H:%M:%S")+">").encode('utf-8')
             client.send(current_time+aliasx+":".encode('utf-8')+message)
+#Same as above but for Direct messaging files
 def dmsend(index,aliasx,message):
     now = datetime.now()
     current_time = ("<"+now.strftime("%H:%M:%S")+">").encode('utf-8')
     dm[index].send(current_time+aliasx+" (DM):".encode('utf-8')+message)
 #This function handles the sending of files to the other clients and works in a similar way as above
-def broadcastfile(dmessage,clientx,aliasx):
+def broadcastfile(fname,clientx,aliasx):
     print("HERE1")
     for client in clients:
         if client != clientx:
             print("HERE2")
-            client.send(dmessage.encode("utf-8"))
-            fname="1"+dmessage[6:]
+            client.send((":File "+fname[1:]).encode("utf-8"))
             print("HERE3")
             with open(fname,'rb') as f:
                 while True:
@@ -46,9 +46,23 @@ def broadcastfile(dmessage,clientx,aliasx):
                         break
                     client.send(data)
             client.send("***END***".encode('utf-8'));
+    print("Deleting "+fname);
     print("File Sent")
-    os.remove("1"+dmessage[6:])
-        
+    os.remove(fname)
+#Same as above but for direct messaging 
+def dmsendfile(index, aliasx, fname):
+    client=dm[index]
+    client.send((":File "+fname[1:]).encode('utf-8'))
+    with open(fname,'rb') as f:
+        while True:
+            data=f.read(2048)
+            if not data:
+                break
+            client.send(data)
+    client.send("***END***".encode('utf-8'))
+    print("Deleting "+fname)
+    print("File sent")
+    os.remove(fname)
 def handle_client(client):
     while True:
         try:
@@ -84,7 +98,19 @@ def handle_client(client):
             #Here we handle the sending of files to the clients
             elif(dmessage[0:5]==':File'):
                 print("Recieving File")
-                fname="1"+dmessage[6:]
+                fname=dmessage[6:]
+                print(fname)
+                #Finds the first occurrence. Need last occurrence
+                # pos=fname.find('/')
+                # fname="1"+fname[pos+1:]
+                post=0
+                pos=-1
+                for i in fname:
+                    if i=='/':
+                        pos=post
+                    post=post+1
+                fname="1"+fname[pos+1:]
+                print(fname)
                 with open(fname,'wb') as f:
                     while True:
                         data=client.recv(2048)
@@ -94,12 +120,16 @@ def handle_client(client):
                         #print(data)
                 print("Recieved File")
                 print("File sent")
-                broadcastfile(dmessage,client,alias)
+                if(dm[index]==None):
+                    broadcastfile(fname,client,alias)
+                    broadcast(("Sent File "+fname[1:]).encode('utf-8'),client,alias)
+                else:
+                    dmsendfile(index, alias, fname)
+                    dmsend(index, alias, ("Sent file "+fname[1:]).encode('utf-8'))
             #Broadcast of normal messages
             else:
                 if(dm[index]==None):
                     broadcast(message,client,alias)
-                    print("Broadcasted");
                 else:
                     dmsend(index,alias,message)
         except:
@@ -109,7 +139,7 @@ def handle_client(client):
             if dmessage != ":Exit":
                 client.close()
             alias = aliases[index]
-            broadcast(alias+'has left the chat room!'.encode('utf-8'))
+            broadcast(alias+' has left the chat room!'.encode('utf-8'))
             aliases.remove(alias)
             dm.pop(index)
             break
@@ -133,7 +163,7 @@ def receive():
                 client.close()
                 continue
         #Requesting for the clients alias and confirming connection to the chat room
-        time.sleep(1)
+        time.sleep(0.1)
         client.send('alias?'.encode('utf-8'))
         alias = client.recv(1024)
         aliases.append(alias)

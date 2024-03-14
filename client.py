@@ -3,6 +3,9 @@
 import threading
 import socket
 import sys
+import time
+import getpass
+
 alias=""
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(('127.0.0.1', 12345))
@@ -16,7 +19,8 @@ def client_receive():
             message = client.recv(1024).decode('utf-8')
             #The first three cases are for handling CLIENTS joining the SERVER
             if message == "Password?":
-                password=input('Enter the Password >>> ');
+                #Getpass doesnt display the password typed
+                password=getpass.getpass('Enter the Password >>> ');
                 client.send(password.encode('utf-8'))
                 continue
             elif message == "alias?":
@@ -55,22 +59,34 @@ def client_send():
     global exit_flag
     while exit_flag:
         message = input("")
-        client.send(message.encode('utf-8'))
         #Handle file trasnfer
         if message[0:5]==':File':
             print("Sending File");
             fname=message[6:]
             #The below is a loop to send the file to the server
-            with open(fname,'rb') as f:
-                while True:
-                    data=f.read(2048)
-                    #print(data)
-                    if not data:
-                        break
-                    client.send(data)
-            #This signals the server to exit the recieving loop
-            client.send("***END***".encode('utf-8'));
-            print("File sent")
+            try:
+                #This is to check for the existance of a file before we begin sending it
+                with open(fname,'rb') as f:
+                    pass
+                client.send(message.encode('utf-8'))
+                time.sleep(0.1)
+                with open(fname,'rb') as f:
+                    while True:
+                        data=f.read(2048)
+                        #print(data)
+                        if not data:
+                            break
+                        client.send(data)
+                #This signals the server to exit the recieving loop
+                client.send("***END***".encode('utf-8'));
+                print("File sent")
+            except FileNotFoundError:
+                print("File Not Found")
+            except Exception as e:
+                print("An error occured")
+                print(e)
+        else:
+            client.send(message.encode('utf-8'))
           
 #We create two threads one for recieving messages from the server          
 receive_thread = threading.Thread(target=client_receive)
