@@ -6,10 +6,11 @@ from datetime import datetime
 import time
 import os
 
-host = '127.0.0.1'
-port = 12345
+host = socket.gethostbyname(socket.gethostname())
+port = 60000
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((host, port))
+print((host,port))
 server.listen()
 clients = [] #Stores the client (well call them ID's)
 dm=[]
@@ -45,6 +46,7 @@ def broadcastfile(fname,clientx,aliasx):
                     if not data:
                         break
                     client.send(data)
+            time.sleep(1)
             client.send("***END***".encode('utf-8'));
     print("Deleting "+fname);
     print("File Sent")

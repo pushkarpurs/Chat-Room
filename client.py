@@ -8,7 +8,7 @@ import getpass
 
 alias=""
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(('127.0.0.1', 12345))
+client.connect(('192.168.254.182', 60000))
 exit_flag=True
 
 def client_receive():
