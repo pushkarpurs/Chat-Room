@@ -9,7 +9,7 @@ STEPS:
 4. All other CLIENTS joining the same SERVER must enter the right PASSWORD
 5. Multiple CLIENTS can join the same SERVER (room) and group chat with one another
 6. Each CLIENT must choose an ALIAS
-7. There is NO mechanism in place to check for DUPLICATE ALIASES as of now. Ensure all ALIASES are UNIQUE
+7. Mechanism to PREVENT DUPLICATE ALIASES 
 8. To send a MESSAGE, type it in normally
 9.  Do NOT BEGIN with the ':' character
 10. To EXIT the room enter ':Exit'
@@ -17,7 +17,12 @@ STEPS:
 12. Ensure the FILE is in the SAME DIRECTORY or a DAUGHTER DIRECTORY to the CLIENT program sending it
 13. Ensure CLIENTS are present in DIFFERENT DIRECTORIES to prevent reading and writing the same file
 14. Switch between messaging EVERYONE ':Dm All' and a SINGLE CLIENT ':Dm <ALIAS>'
+15. Enter :Aliases to get a list of aliases connected to the server
 
-The recieved file is appended with 2 and the buffered file is appended with 1
-this is done to ensure that testing is easier. we can execute all the programs in the same directory
-without having to read to and write from the same file simultaneously
+The recieved file name is appended with 2 and the buffered file name is appended with 1
+Done to ensure that testing is easier. we can execute all the programs in the same directory
+Prevents read to and write from the same file simultaneously
+
+The program is configured to use a signed certificate and a private key to implement ssl. 
+Generate the necessary certificate and files
+Ensure the naming of the files before running the program

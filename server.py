@@ -5,20 +5,25 @@ import socket
 from datetime import datetime
 import time
 import os
+import ssl
 
+ctxt=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+ctxt.load_cert_chain('signedcert.pem','private.key')
 host = socket.gethostbyname(socket.gethostname())
 port = 60000
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind((host, port))
+soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+soc.bind((host, port))
 print((host,port))
-server.listen()
+soc.listen()
+
+server=ctxt.wrap_socket(soc, server_side=True)
 clients = [] #Stores the client (well call them ID's)
-dm=[]
+dm=[]        #Used for firect messaging. Stores a single client to message
 aliases = [] #Stores the aliases of the clients
 passw=""
 print('Server is up')
 
-#The below function handles the transfer of messaages from one client to all other client
+#The below function handles the transfer of messages from one client to all other client
 def broadcast(message,clientx="",aliasx="Server".encode('utf-8')):
     #Iterate through the list of clients but skip the sending client (As we dont want to send the same message to the one who sent it in the first place)
     for client in clients:
@@ -61,6 +66,8 @@ def dmsendfile(index, aliasx, fname):
             if not data:
                 break
             client.send(data)
+    #Sleep is used to synchonize the client and server
+    #We dont use any heades to send the length of the message beforehand
     time.sleep(1)
     client.send("***END***".encode('utf-8'))
     print("Deleting "+fname)
@@ -103,11 +110,9 @@ def handle_client(client):
                 print("Recieving File")
                 fname=dmessage[6:]
                 print(fname)
-                #Finds the first occurrence. Need last occurrence
-                # pos=fname.find('/')
-                # fname="1"+fname[pos+1:]
                 post=0
                 pos=-1
+                #This processes file name for recieving files from daughter directory
                 for i in fname:
                     if i=='/':
                         pos=post
@@ -129,7 +134,16 @@ def handle_client(client):
                 else:
                     dmsendfile(index, alias, fname)
                     dmsend(index, alias, ("Sent file "+fname[1:]).encode('utf-8'))
-            #Broadcast of normal messages
+            #Sends the list of aliases to the clients
+            elif dmessage==":Aliases":
+                inos=1
+                for i in aliases:
+                    if i==alias:
+                        client.send((str(inos)+". ").encode('utf-8')+i+" (YOU)".encode('utf-8'))
+                    else:
+                        client.send((str(inos)+". ").encode('utf-8')+i)
+                    inos=inos+1
+            #Handles the broadcast of normal messages
             else:
                 if(dm[index]==None):
                     broadcast(message,client,alias)
@@ -166,9 +180,14 @@ def receive():
                 client.close()
                 continue
         #Requesting for the clients alias and confirming connection to the chat room
-        time.sleep(0.1)
-        client.send('alias?'.encode('utf-8'))
-        alias = client.recv(1024)
+        while True:
+            time.sleep(1)
+            client.send('alias?'.encode('utf-8'))
+            alias = client.recv(1024)
+            if alias not in aliases:
+                break
+            client.send("Alias already in use. Chose another".encode('utf-8'))
+        client.send("ALIAS ACCEPTED".encode('utf-8'))
         aliases.append(alias)
         clients.append(client)
         dm.append(None)
