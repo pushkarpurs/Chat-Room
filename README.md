@@ -43,3 +43,11 @@ The server requires the .pem and the .key files both
 The client requires the .pem file
 Ensure they are in the same directories as the server and client programs
 Alternatively modify client ans server programs to reflect the locations of the .key and .pem files
+
+REFERENCES:
+
+1. TCP chat application
+https://dev.to/bekbrace/network-programming-in-python-2-projects-34nk
+
+2. SSL implementation
+https://www.youtube.com/watch?v=N4utwloVeOE
